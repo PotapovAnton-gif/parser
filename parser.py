@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
  
 
-
+URL = 'https://www.e-katalog.ru/list/30/'
 HEADERS = {'user-agent':'Mozilla/5.0 (X11; CrOS x86_64 13310.93.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.133 Safari/537.36','accept':'*/*'}
 HOST = 'https://www.e-katalog.ru/'
 
@@ -69,5 +69,6 @@ def parse(URL):
     else:
         print('Error')
 
-        
+if __name__ == "__main__":
+    print(parse(URL))
     
