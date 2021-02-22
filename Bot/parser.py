@@ -2,7 +2,6 @@ import requests
 from bs4 import BeautifulSoup
  
 
-URL = 'https://www.e-katalog.ru/list/30/'
 HEADERS = {'user-agent':'Mozilla/5.0 (X11; CrOS x86_64 13310.93.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.133 Safari/537.36','accept':'*/*'}
 HOST = 'https://www.e-katalog.ru/'
 
@@ -44,7 +43,7 @@ def get_html(url, params = None):
 
 def get_content(html):
     
-    soup = BeautifulSoup(html, 'html.parser')
+    
     items = soup.find_all('div', class_ = 'model-short-div list-item--goods')
     cars = []
     for item in items:
@@ -58,17 +57,33 @@ def get_content(html):
 
 def parse(URL):
     html = get_html(URL)
-    device = []
+    title = []
+    price = []
+    link = []
+    additional_information = []
+    device = {'title':title, 'price':price, 'link':link, 'additional information':additional_information}
     if html.status_code == 200:
+        
         pages_count = int(get_pages_count(html.text))
+        
         for page in range(1, pages_count +1):
             print(f'Идет парсинг страницы {page}')
             html = get_html(URL)
-            device.append(get_content(html.text))
-        return device
+            soup = BeautifulSoup(html.text, 'html.parser')
+            items = soup.find_all('div', class_ = 'model-short-div list-item--goods')
+            
+            for item in items:
+                
+                device['title'].append(item.find('span', class_ = 'u').get_text(strip = True))
+                device['price'].append(make_price(item.find('div', class_ = 'model-price-range').get_text(strip = True)))
+                device['link'].append(HOST + item.find('a').get('href')) 
+                device['additional information'].append(make_inform(item.find('div', class_ = 'm-s-f2 no-mobile').get_text()))
+
+        return (device)
     else:
         print('Error')
 
 if __name__ == "__main__":
+    URL = 'https://www.e-katalog.ru/list/30/'
     print(parse(URL))
     
